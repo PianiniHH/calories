@@ -19,11 +19,15 @@ class Recipe:
         return self.name
 
     @classmethod
-    def create_and_save_new_recipe(cls, location) -> dict:
+    def create_and_save_new_recipe(cls, location=None) -> None:
         recipe_name = input('Recipe Name: ')
-        new_recipe = Recipe(name=recipe_name)
-        new_recipe = new_recipe.gather_ingredients()
-        hlp.add_to_csv_file(new_recipe, location, Recipe.fieldnames)
+        saveable_recipe = Recipe(name=recipe_name)
+        saveable_recipe = saveable_recipe.gather_ingredients()
+        recipe = Recipe.build_recipe_object_from_dict(
+            saveable_recipe)
+        recipe.show_recipe()
+        if hlp.get_user_confirmation('Would you like to save the recipe? (y/n): '):
+            hlp.add_to_csv_file(saveable_recipe, location, Recipe.fieldnames)
 
     @classmethod
     def build_recipe_object_from_dict(cls, ingredients: dict):
@@ -87,12 +91,16 @@ class Recipe:
                 if 'qt' not in key:
                     if key == food.name:
                         ingredients.append(food)
-        print(self.name)
         hlp.show_enumerated_list(ingredients)
+
+    def show_recipe(self):
+        print(self.name)
+        for key, value in self.ingredients.items():
+            print(key, value)
 
 
 if __name__ == '__main__':
-    # new_recipe = Recipe.create_and_save_new_recipe()
+    new_recipe = Recipe.create_and_save_new_recipe()
 
     # with open('recipes.csv', 'a') as f:
     #     fieldnames =
@@ -104,7 +112,7 @@ if __name__ == '__main__':
     #     reader = csv.DictReader(f, delimiter=',')
     #     recipes = list(reader)
 
-    my_recipes = Recipe.prepare_recipe_data(DATA_FILE_RECIPES)
+    # my_recipes = Recipe.prepare_recipe_data(DATA_FILE_RECIPES)
 
-    print(my_recipes[0].name)
-    my_recipes[0].show_ingredients(DATA_FILE_FOOD)
+    # print(my_recipes[0].name)
+    # my_recipes[0].show_ingredients(DATA_FILE_FOOD)
